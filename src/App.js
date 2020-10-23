@@ -6,9 +6,8 @@ import data from './data';
 import Navigation from './components/Navigation';
 import Products from './components/Products';
 import ShoppingCart from './components/ShoppingCart';
-
-export const MyProducts = createContext()
-export const MyCarts = createContext()
+import {CartContext} from './contexts/cartContext'
+import {ProductsContext} from './contexts/productContext'
 
 function App() {
 	const [products] = useState(data);
@@ -16,27 +15,36 @@ function App() {
 
 	const addItem = item => {
 		// add the given item to the cart
+		console.log('number of items in cart',cart)
+		setCart([...cart,item])
 	};
+	const removeItem = itemId=>{
+		setCart(cart.filter(item=> item.id != itemId))
+		
+	}
 
 	return (
 		<div className="App">
-			<MyCarts.Provider value={cart}>
+			<ProductsContext.Provider value={{products,addItem}} >
+				
+				<CartContext.Provider value={{cart,removeItem}}>
+
 				<Navigation />
-			</MyCarts.Provider>
-			
+		
+				{/* Routes */}
+				<Route exact path="/">
+				
+					<Products />
+					
+				</Route>
 
-			{/* Routes */}
-			<Route exact path="/">
-			<MyProducts.Provider value={products}>
-				<Products  />
-				</MyProducts.Provider>
-			</Route>
-
-			<Route path="/cart">
-				<MyCarts.Provider value={cart}>
+				<Route path="/cart">
 					<ShoppingCart  />
-				</MyCarts.Provider>
-			</Route>
+				</Route>
+
+				</CartContext.Provider>
+
+			</ProductsContext.Provider>
 		</div>
 	);
 }
